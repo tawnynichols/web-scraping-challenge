@@ -5,7 +5,15 @@ from webdriver_manager.chrome import ChromeDriverManager
 executable_path = {"executable_path": ChromeDriverManager().install()}
 browser = Browser('chrome', **executable_path, headless=False)
 
+###############################################################
+# Scraping Script
+############################################################### 
+
 def scrape_info():
+
+    ###############################################################
+    # Mars News Article
+    ############################################################### 
     # set url for browser
     url = 'https://mars.nasa.gov/news'
     browser.visit(url)
@@ -16,10 +24,10 @@ def scrape_info():
         html = browser.html
         # Parse HTML with Beautiful Soup
         soup = BeautifulSoup(html, 'html.parser')
-        # Retrieve all elements that contain book information
+        # Retrieve all elements that contain article info
         articles = soup.find_all('div', class_='list_text')
 
-        # Iterate through each book
+        # Iterate through each news article
         for article in articles:
             # Use Beautiful Soup's find() method to navigate and retrieve attributes
             news_title  = article.find('div', class_="content_title").text
@@ -31,17 +39,152 @@ def scrape_info():
             browser.click_link_by_partial_text('More')
             
         except:
-            print("Scraping Complete")
+            print("Mars News Scraping Complete")
 
-    # Store data in a dictionary
-    mars_data = {
-        "min_temp": news_title,
-        "max_temp": news_p
-    } 
+        # Store data in a dictionary
+        mars_data = {
+            "news_title": news_title,
+            "news_p": news_p
+        } 
+
+
+    ###############################################################
+    # Featured Image
+    ############################################################### 
+    
+    # set url for browser
+    domain = 'https://www.jpl.nasa.gov'
+    space_url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
+    browser.visit(space_url)
+
+    # Use splinter to navigate the site and find the image url for the current Featured Mars Image and assign the url string to a variable called featured_image_url.
+    html = browser.html
+
+    # Parse HTML with Beautiful Soup
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Retrieve all elements that contain image link
+    images = soup.find_all('article')
+
+    for img in images:
+        data_link = img.find('a')['data-link']
+        
+        # Open data link to get full size image
+        data_link_url = domain + data_link
+    
+
+        try:
+            browser.visit(data_link_url)
+            html = browser.html
+
+            # Parse HTML with Beautiful Soup
+            soup = BeautifulSoup(html, 'html.parser')
+            
+            # Make sure to find the image url to the full size .jpg image.        
+            iamge_articles = soup.find_all('article')
+            
+            for iamge_article in iamge_articles:
+                figure = iamge_article.find('figure')
+                figure_url = figure.find('a')['href']
+                
+                # Make sure to save a complete url string for this image.
+                featured_image_url  = domain + figure_url
+                print(featured_image_url)
+                mars_data["featured_image_url"] =  featured_image_url      
+            
+        except:
+            print("Featured Image Scraping Complete")  
+
+    ###############################################################
+    # Mars  Hemispheres
+    ############################################################### 
+
+    # Visit the Mars Facts webpage here 
+    mars_url = 'https://space-facts.com/mars/'
+
+    # use Pandas to scrape the table containing facts about the planet including Diameter, Mass, etc.
+    import pandas as pd
+
+    # Use Pandas to convert the data to a HTML table string.
+    tables = pd.read_html(mars_url)
+
+    df = tables[0]
+    df.columns = ['Topic', 'Value']
+
+    # render dataframe as html
+    html = df.to_html(table_id="Table")
+    mars_data["html"] =  html 
+    print(html)
+
+
+    ###############################################################
+    # Mars  Hemispheres
+    ############################################################### 
+
+    # Visit the USGS Astrogeology site here to obtain high resolution images for each of Mar's hemispheres.
+    usgs_site = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(usgs_site)
+
+    html = browser.html
+
+    # Parse HTML with Beautiful Soup
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Retrieve all elements that contain image section
+    image_section = soup.find_all('div', class_='item')
+
+
+    # Create lists to hold each title and image
+    titles = []
+    images = []
+
+    # loop to append title and images to lists
+    for image in image_section:
+        figure_url = image.find('a')['href']
+        image_url = 'https://astrogeology.usgs.gov' + figure_url
+        title = image.find('h3').text
+        print(title)
+    #     print(image_url)
+        
+        titles.append(title)
+        
+        try:
+            browser.visit(image_url)
+            html = browser.html
+
+            # Parse HTML with Beautiful Soup
+            soup = BeautifulSoup(html, 'html.parser')
+
+            # Retrieve all elements that contain image section
+            thumnb_url = soup.find_all('div', class_='downloads')
+
+            for thumb in thumnb_url:
+                image_list = thumb.find('li')
+                image_full_url = image_list.find('a')['href']
+                images.append(image_full_url)
+                print(image_full_url)
+
+
+        except:
+            print('Did not work')
+ 
+    # Save both the image url string for the full resolution hemisphere image, and the Hemisphere title containing the hemisphere name. 
+    # Use a Python dictionary to store the data using the keys img_url and title.
+    image_urls = {}
+    image_urls = dict(zip(titles, images))
+
+    # Append the dictionary with the image url string and the hemisphere title to a list. 
+    # This list will contain one dictionary for each hemisphere.
+    hemisphere_image_urls = [] 
+    for key, value in image_urls.items(): 
+        hemisphere_image_urls.append({'title' : key, 'img_url' : value}) 
+
+    # Append to mars data 
+    mars_data["hemisphere_image_urls"] =  hemisphere_image_urls   
+    print(hemisphere_image_urls)
 
     # Close the browser after scraping
     browser.quit()
 
     # Return results
-    return mars_data    
-    
+    return mars_data  
