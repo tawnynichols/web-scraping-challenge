@@ -25,13 +25,16 @@ def scrape():
         # Parse HTML with Beautiful Soup
         soup = BeautifulSoup(html, 'html.parser')
         # Retrieve all elements that contain article info
-        articles = soup.find_all('div', class_='list_text')
+        articles = soup.find_all('li', class_='slide')
 
         # Iterate through each news article
         for article in articles:
             # Use Beautiful Soup's find() method to navigate and retrieve attributes
             news_title  = article.find('div', class_="content_title").text
             news_p = article.find('div', class_='article_teaser_body').text
+            img_header =article.find('div', class_='list_image')
+            img = img_header.find('img')['src']
+            new_image = 'https://mars.nasa.gov' + img
            
 
         # Click the 'More' button on each page
@@ -44,7 +47,8 @@ def scrape():
         # Store data in a dictionary
         mars_data = {
             "news_title": news_title,
-            "news_p": news_p
+            "news_p": news_p,
+            "new_image": new_image
         } 
 
 
@@ -97,7 +101,7 @@ def scrape():
             print("Featured Image Scraping Complete")  
 
     ###############################################################
-    # Mars  Hemispheres
+    # Mars  Facts
     ############################################################### 
 
     # Visit the Mars Facts webpage here 
