@@ -9,7 +9,7 @@ browser = Browser('chrome', **executable_path, headless=False)
 # Scraping Script
 ############################################################### 
 
-def scrape_info():
+def scrape():
 
     ###############################################################
     # Mars News Article
@@ -90,7 +90,8 @@ def scrape_info():
                 # Make sure to save a complete url string for this image.
                 featured_image_url  = domain + figure_url
                 print(featured_image_url)
-                mars_data["featured_image_url"] =  featured_image_url      
+                mars_data["featured_image_url"] =  featured_image_url  
+                mars_data["domain"]  = domain
             
         except:
             print("Featured Image Scraping Complete")  
@@ -112,9 +113,14 @@ def scrape_info():
     df.columns = ['Topic', 'Value']
 
     # render dataframe as html
-    html = df.to_html(table_id="Table")
+    html = df.to_html(table_id="table")
     mars_data["html"] =  html 
     print(html)
+
+    # render dataframe as dictionary
+    table = df.values.tolist()
+    mars_data["table"] =  table    
+    print(table)
 
 
     ###############################################################
