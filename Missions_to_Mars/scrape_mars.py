@@ -15,7 +15,8 @@ def scrape():
     # Mars News Article
     ############################################################### 
     # set url for browser
-    url = 'https://mars.nasa.gov/news'
+    news_domain = 'https://mars.nasa.gov'
+    url = news_domain + '/news'
     browser.visit(url)
 
     # Loop to get news_title and news_p
@@ -34,21 +35,22 @@ def scrape():
             news_p = article.find('div', class_='article_teaser_body').text
             img_header =article.find('div', class_='list_image')
             img = img_header.find('img')['src']
-            new_image = 'https://mars.nasa.gov' + img
-           
+            news_image = news_domain + img
+            print("Mars News Complete")
 
         # Click the 'More' button on each page
         try:
             browser.click_link_by_partial_text('More')
             
         except:
-            print("Mars News Scraping Complete")
+            print("Mars News No More to Scrape")
 
         # Store data in a dictionary
         mars_data = {
             "news_title": news_title,
             "news_p": news_p,
-            "new_image": new_image
+            "news_image": news_image,
+            "news_domain" : url
         } 
 
 
@@ -57,7 +59,7 @@ def scrape():
     ############################################################### 
     
     # set url for browser
-    domain = 'https://www.jpl.nasa.gov'
+    Featured_domain = 'https://www.jpl.nasa.gov'
     space_url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
     browser.visit(space_url)
 
@@ -74,9 +76,8 @@ def scrape():
         data_link = img.find('a')['data-link']
         
         # Open data link to get full size image
-        data_link_url = domain + data_link
+        data_link_url = Featured_domain + data_link
     
-
         try:
             browser.visit(data_link_url)
             html = browser.html
@@ -92,13 +93,13 @@ def scrape():
                 figure_url = figure.find('a')['href']
                 
                 # Make sure to save a complete url string for this image.
-                featured_image_url  = domain + figure_url
-                print(featured_image_url)
+                featured_image_url  = Featured_domain + figure_url
                 mars_data["featured_image_url"] =  featured_image_url  
-                mars_data["domain"]  = domain
+                mars_data["Featured_domain"]  = Featured_domain
+                print("Featured Image Complete")  
             
         except:
-            print("Featured Image Scraping Complete")  
+            print("Featured Image Scraping Error")  
 
     ###############################################################
     # Mars  Facts
@@ -119,12 +120,11 @@ def scrape():
     # render dataframe as html
     html = df.to_html(table_id="table")
     mars_data["html"] =  html 
-    print(html)
 
     # render dataframe as dictionary
     table = df.values.tolist()
     mars_data["table"] =  table    
-    print(table)
+    print("Mars Facts Complete")
 
 
     ###############################################################
@@ -133,6 +133,7 @@ def scrape():
 
     # Visit the USGS Astrogeology site here to obtain high resolution images for each of Mar's hemispheres.
     usgs_site = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    usgs_domain = 'https://astrogeology.usgs.gov'
     browser.visit(usgs_site)
 
     html = browser.html
@@ -151,10 +152,8 @@ def scrape():
     # loop to append title and images to lists
     for image in image_section:
         figure_url = image.find('a')['href']
-        image_url = 'https://astrogeology.usgs.gov' + figure_url
+        image_url = usgs_domain + figure_url
         title = image.find('h3').text
-        print(title)
-    #     print(image_url)
         
         titles.append(title)
         
@@ -172,8 +171,6 @@ def scrape():
                 image_list = thumb.find('li')
                 image_full_url = image_list.find('a')['href']
                 images.append(image_full_url)
-                print(image_full_url)
-
 
         except:
             print('Did not work')
@@ -191,7 +188,7 @@ def scrape():
 
     # Append to mars data 
     mars_data["hemisphere_image_urls"] =  hemisphere_image_urls   
-    print(hemisphere_image_urls)
+    print("Hemisphere Complete")
 
     # Close the browser after scraping
     browser.quit()
