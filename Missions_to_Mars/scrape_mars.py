@@ -26,7 +26,8 @@ def scrape():
         # Parse HTML with Beautiful Soup
         soup = BeautifulSoup(html, 'html.parser')
         # Retrieve all elements that contain article info
-        articles = soup.find_all('li', class_='slide')
+        article = soup.find_all('li', class_='slide')
+        articles = article[x]        
 
         # Iterate through each news article
         for article in articles:
@@ -35,15 +36,15 @@ def scrape():
             news_p = article.find('div', class_='article_teaser_body').text
             img_header =article.find('div', class_='list_image')
             img = img_header.find('img')['src']
-            news_image = news_domain + img
-            print("Mars News Complete")
+            news_image = 'https://mars.nasa.gov' + img
 
         # Click the 'More' button on each page
         try:
-            browser.click_link_by_partial_text('More')
+            browser.click_link_by_text('More')
+            print("Mars News Complete")
             
         except:
-            print("Mars News No More to Scrape")
+            print("Mars News Scraping Complete")
 
         # Store data in a dictionary
         mars_data = {
