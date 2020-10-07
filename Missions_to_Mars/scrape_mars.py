@@ -26,8 +26,7 @@ def scrape():
         # Parse HTML with Beautiful Soup
         soup = BeautifulSoup(html, 'html.parser')
         # Retrieve all elements that contain article info
-        article = soup.find_all('li', class_='slide')
-        articles = article[x]        
+        articles = soup.find_all('li', class_='slide')[x]       
 
         # Iterate through each news article
         for article in articles:
