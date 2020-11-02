@@ -19,39 +19,27 @@ def scrape():
     url = news_domain + '/news'
     browser.visit(url)
 
-    # Loop to get news_title and news_p
-    for x in range(1):
-        # HTML object
-        html = browser.html
-        # Parse HTML with Beautiful Soup
-        soup = BeautifulSoup(html, 'html.parser')
-        # Retrieve all elements that contain article info
-        articles = soup.find_all('li', class_='slide')[x]       
+    # Get news_title and news_p
+    # HTML object
+    html = browser.html
+    # Parse HTML with Beautiful Soup
+    soup = BeautifulSoup(html, 'html.parser')     
 
-        # Iterate through each news article
-        for article in articles:
-            # Use Beautiful Soup's find() method to navigate and retrieve attributes
-            news_title  = article.find('div', class_="content_title").text
-            news_p = article.find('div', class_='article_teaser_body').text
-            img_header =article.find('div', class_='list_image')
-            img = img_header.find('img')['src']
-            news_image = 'https://mars.nasa.gov' + img
+    # Use Beautiful Soup's find() method to navigate and retrieve attributes
+    news_title  = soup.find('div', class_="content_title").text
+    news_p = soup.find('div', class_='article_teaser_body').text
+    img_header =soup.find('div', class_='list_image')
+    img = img_header.find('img')['src']
+    news_image = 'https://mars.nasa.gov' + img
+    print("Mars News Scraping Complete")
 
-        # Click the 'More' button on each page
-        try:
-            browser.click_link_by_text('More')
-            print("Mars News Complete")
-            
-        except:
-            print("Mars News Scraping Complete")
-
-        # Store data in a dictionary
-        mars_data = {
-            "news_title": news_title,
-            "news_p": news_p,
-            "news_image": news_image,
-            "news_domain" : url
-        } 
+    # Store data in a dictionary
+    mars_data = {
+        "news_title": news_title,
+        "news_p": news_p,
+        "news_image": news_image,
+        "news_domain" : url
+    } 
 
 
     ###############################################################
