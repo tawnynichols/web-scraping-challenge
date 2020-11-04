@@ -2,14 +2,20 @@ from splinter import Browser
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 
-executable_path = {"executable_path": ChromeDriverManager().install()}
-browser = Browser('chrome', **executable_path, headless=False)
+# executable_path = {"executable_path": ChromeDriverManager().install()}
+# browser = Browser('chrome', **executable_path, headless=False)
+
+def init_browser():
+    executable_path = {"executable_path": ChromeDriverManager().install()}
+    return Browser("chrome", **executable_path, headless=False)
 
 ###############################################################
 # Scraping Script
 ############################################################### 
 
 def scrape():
+
+    browser = init_browser()
 
     ###############################################################
     # Mars News Article
@@ -41,7 +47,7 @@ def scrape():
         "news_domain" : url
     } 
 
-
+    
     ###############################################################
     # Featured Image
     ############################################################### 
