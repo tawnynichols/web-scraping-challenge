@@ -22,7 +22,7 @@ def scrape():
     ############################################################### 
     # set url for browser
     news_domain = 'https://mars.nasa.gov'
-    url = news_domain + '/news'
+    url = news_domain + '/news/'
     browser.visit(url)
 
     # Get news_title and news_p
@@ -45,6 +45,8 @@ def scrape():
         "news_p": news_p,
         "news_image": news_image,
         "news_domain" : url
+
+
     } 
 
     
