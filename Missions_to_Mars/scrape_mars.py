@@ -3,7 +3,7 @@ from splinter import Browser
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 
-# executable_path = {"executable_path": ChromeDriverManager().install()}
+# executable_path = {'executable_path': ChromeDriverManager().install()}
 # browser = Browser('chrome', **executable_path, headless=False)
 
 def init_browser():
@@ -36,27 +36,65 @@ def scrape():
     soup = BeautifulSoup(html, 'html.parser')     
 
     # Use Beautiful Soup's find() method to navigate and retrieve attributes
-    article = soup.find("div", class_="list_text")
-    news_title = article.find("div", class_="content_title").text
-    news_p = article.find("div", class_="article_teaser_body").text
+    article = soup.find('div', class_='list_text')
 
-    # Store data in a dictionary
-    mars_data["news_title"] = news_title
-    mars_data["news_p"] = news_p
-    mars_data["news_domain"] = news_domain
-    mars_data["news"] = url
+    try:
+        news_title = article.find('div', class_='content_title').text
+        news_p = article.find('div', class_='article_teaser_body').text
 
-    # Use Beautiful Soup's find() method to navigate and retrieve attributes
-    img_header =soup.find('div', class_='list_image')
-    img = img_header.find('img')['src']
-    news_image = news_domain + img
+        # Store data in a dictionary
+        mars_data['news_title'] = news_title
+        mars_data['news_p'] = news_p
+        mars_data['news_domain'] = news_domain
+        mars_data['news'] = url
 
-    # Store data in a dictionary
-    mars_data["news_image"] = news_image
-    print("Mars News Scraping Complete")   
+        # Use Beautiful Soup's find() method to navigate and retrieve attributes
+        img_header =soup.find('div', class_='list_image')
+        img = img_header.find('img')['src']
+        news_image = news_domain + img
 
-    # Close the browser after scraping
-    browser.quit()
+        # Store data in a dictionary
+        mars_data['news_image'] = news_image
+        print('Mars News Scraping Complete') 
+
+        # Close the browser after scraping
+        browser.quit()  
+
+    except:
+        print('Retrying for a connection')
+
+        # set url for browser
+        news_domain = 'https://mars.nasa.gov'
+        url = news_domain + '/news/'
+        browser.visit(url)
+
+        # HTML object
+        html = browser.html
+        # Parse HTML with Beautiful Soup
+        soup = BeautifulSoup(html, 'html.parser')     
+
+        # Use Beautiful Soup's find() method to navigate and retrieve attributes
+        article = soup.find('div', class_='list_text')
+        news_title = article.find('div', class_='content_title').text
+        news_p = article.find('div', class_='article_teaser_body').text
+
+        # Store data in a dictionary
+        mars_data['news_title'] = news_title
+        mars_data['news_p'] = news_p
+        mars_data['news_domain'] = news_domain
+        mars_data['news'] = url
+
+        # Use Beautiful Soup's find() method to navigate and retrieve attributes
+        img_header =soup.find('div', class_='list_image')
+        img = img_header.find('img')['src']
+        news_image = news_domain + img
+
+        # Store data in a dictionary
+        mars_data['news_image'] = news_image
+        print('Mars News Scraping Complete')   
+        
+        # Close the browser after scraping
+        browser.quit()
     
     ###############################################################
     # Featured Image
@@ -100,13 +138,13 @@ def scrape():
                 
                 # Make sure to save a complete url string for this image.
                 featured_image_url  = Featured_domain + figure_url
-                mars_data["featured_image_url"] =  featured_image_url  
-                mars_data["Featured_domain"]  = Featured_domain
-                mars_data["space_url"]  = space_url
-                print("Featured Image Complete")  
+                mars_data['featured_image_url'] =  featured_image_url  
+                mars_data['Featured_domain']  = Featured_domain
+                mars_data['space_url']  = space_url
+                print('Featured Image Complete')  
             
         except:
-            print("Featured Image Scraping Error")  
+            print('Featured Image Scraping Error')  
 
     # Close the browser after scraping
     browser.quit()
@@ -127,13 +165,13 @@ def scrape():
     df.columns = ['Topic', 'Value']
 
     # render dataframe as html
-    html = df.to_html(table_id="table")
-    mars_data["html"] =  html 
+    html = df.to_html(table_id='table')
+    mars_data['html'] =  html 
 
     # render dataframe as dictionary
     table = df.values.tolist()
-    mars_data["table"] =  table    
-    print("Mars Facts Complete")
+    mars_data['table'] =  table    
+    print('Mars Facts Complete')
 
     # Close the browser after scraping
     browser.quit()
@@ -200,13 +238,13 @@ def scrape():
         hemisphere_image_urls.append({'title' : key, 'img_url' : value}) 
 
     # Append to mars data 
-    mars_data["hemisphere_image_urls"] =  hemisphere_image_urls   
-    print("Hemisphere Complete")
+    mars_data['hemisphere_image_urls'] =  hemisphere_image_urls   
+    print('Hemisphere Complete')
 
     # Close the browser after scraping
     browser.quit()
 
-    print("All Scraping Complete!")
+    print('All Scraping Complete!')
 
     # Return results
     return mars_data  
