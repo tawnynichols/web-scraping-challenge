@@ -1,10 +1,8 @@
+
 import pandas as pd
 from splinter import Browser
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
-
-# executable_path = {'executable_path': ChromeDriverManager().install()}
-# browser = Browser('chrome', **executable_path, headless=False)
 
 def init_browser():
     executable_path = {"executable_path": ChromeDriverManager().install()}
@@ -13,9 +11,6 @@ def init_browser():
 ###############################################################
 # Scraping Script
 ############################################################### 
-
-#Create empty dictionary to store values
-mars_data = {}
 
 def scrape():
     # Run init_browser
@@ -32,69 +27,35 @@ def scrape():
 
     # HTML object
     html = browser.html
+
     # Parse HTML with Beautiful Soup
-    soup = BeautifulSoup(html, 'html.parser')     
+    soup = BeautifulSoup(html, 'html.parser')   
+
+    # Get latest news title and paragraph  
+    article = soup.find('div', class_='list_text')
+    news_title = article.find('div', class_='content_title').find('a').text
+    news_p = article.find('div', class_='article_teaser_body').text
+
+    #Create empty dictionary to store values
+    mars_data = {}
+
+    # Store data in a dictionary
+    mars_data['news_title'] = news_title
+    mars_data['news_p'] = news_p
+    mars_data['news_domain'] = news_domain
+    mars_data['news'] = url
 
     # Use Beautiful Soup's find() method to navigate and retrieve attributes
-    article = soup.find('div', class_='list_text')
+    img_header =soup.find('div', class_='list_image')
+    img = img_header.find('img')['src']
+    news_image = news_domain + img
 
-    try:
-        news_title = article.find('div', class_='content_title').text
-        news_p = article.find('div', class_='article_teaser_body').text
+    # Store data in a dictionary
+    mars_data['news_image'] = news_image
+    print('Mars News Scraping Complete') 
 
-        # Store data in a dictionary
-        mars_data['news_title'] = news_title
-        mars_data['news_p'] = news_p
-        mars_data['news_domain'] = news_domain
-        mars_data['news'] = url
-
-        # Use Beautiful Soup's find() method to navigate and retrieve attributes
-        img_header =soup.find('div', class_='list_image')
-        img = img_header.find('img')['src']
-        news_image = news_domain + img
-
-        # Store data in a dictionary
-        mars_data['news_image'] = news_image
-        print('Mars News Scraping Complete') 
-
-        # Close the browser after scraping
-        browser.quit()  
-
-    except:
-        print('Retrying for a connection')
-
-        # set url for browser
-        news_domain = 'https://mars.nasa.gov'
-        url = news_domain + '/news/'
-        browser.visit(url)
-
-        # HTML object
-        html = browser.html
-        # Parse HTML with Beautiful Soup
-        soup = BeautifulSoup(html, 'html.parser')     
-
-        # Use Beautiful Soup's find() method to navigate and retrieve attributes
-        article = soup.find('div', class_='list_text')
-        news_title = article.find('div', class_='content_title').text
-        news_p = article.find('div', class_='article_teaser_body').text
-
-        # Store data in a dictionary
-        mars_data['news_title'] = news_title
-        mars_data['news_p'] = news_p
-        mars_data['news_domain'] = news_domain
-        mars_data['news'] = url
-
-        # Use Beautiful Soup's find() method to navigate and retrieve attributes
-        img_header =soup.find('div', class_='list_image')
-        img = img_header.find('img')['src']
-        news_image = news_domain + img
-
-        # Store data in a dictionary
-        mars_data['news_image'] = news_image
-        print('Mars News Scraping Complete')   
-        
-        # Close the browser after scraping
-        browser.quit()
+    # Close the browser after scraping
+    browser.quit()  
     
     ###############################################################
     # Featured Image

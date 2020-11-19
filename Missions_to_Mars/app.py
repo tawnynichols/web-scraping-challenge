@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, redirect
 from flask_pymongo import PyMongo
 import scrape_mars
@@ -13,10 +14,10 @@ mongo = PyMongo(app, uri="mongodb://localhost:27017/mars_app")
 def home():
 
     # Find one record of data from the mongo database
-    mars_data = mongo.db.collection.find_one()
+    mars_one = mongo.db.collection.find_one()
 
     # Return template and data
-    return render_template("index.html", dict=mars_data)
+    return render_template("index.html", dict=mars_one)
 
 # Route that will trigger the scrape function
 @app.route("/scrape")
@@ -30,7 +31,6 @@ def scrape():
 
     # Redirect back to home page
     return redirect("/")
-
 
 if __name__ == "__main__":
     app.run(debug=True)
